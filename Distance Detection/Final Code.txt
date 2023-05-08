@@ -256,6 +256,9 @@ const u8g_fntpgm_uint8_t Gamer_digits[137] U8G_FONT_SECTION("Gamer_digits") = {
 #define sensor_3_PIN_TRIG 3
 #define sensor_3_PIN_ECHO 2
 
+#define led_red 7
+#define buzzer 8
+
 #define NUMBER_OF_SENSORS 3
 
 struct sensor_data{
@@ -285,6 +288,9 @@ int dist_step_02;
 int dist_step_03;
 int dist_step_04;
 
+//defining the minimum distance
+int minimum;
+
 void setup() {
   Serial.begin(115200);
 
@@ -306,7 +312,10 @@ void setup() {
   pinMode(sensor[1].trig_pin, OUTPUT);
   pinMode(sensor[1].echo_pin, INPUT);
   pinMode(sensor[2].trig_pin, OUTPUT);
-  pinMode(sensor[2].echo_pin, INPUT);  
+  pinMode(sensor[2].echo_pin, INPUT);
+
+  pinMode(led_red,OUTPUT);
+  pinMode(buzzer,OUTPUT);
 
   //Setting the xpos and ypos for the sensor values
   sensor[0].starting_x_pos = 41;
@@ -351,8 +360,18 @@ void loop() {
     sensor[i].xpos = map(constrain(sensor[i].measured_distance_cm, min_dist, max_dist), min_dist, max_dist, sensor[i].starting_x_pos, sensor[i].ending_x_pos);
     sensor[i].ypos = map(constrain(sensor[i].measured_distance_cm, min_dist, max_dist), min_dist, max_dist, sensor[i].starting_y_pos, sensor[i].ending_y_pos);  
   }
+
   
-  delay(500);
+  
+  if ((sensor[0].measured_distance_cm < 10) || (sensor[1].measured_distance_cm < 10) || (sensor[2].measured_distance_cm < 10)){
+    digitalWrite(led_red,HIGH);
+    digitalWrite(buzzer,HIGH);
+  }else{
+    digitalWrite(led_red,LOW);
+    digitalWrite(buzzer,LOW);
+  }
+
+  delay(100);
 
   u8g.firstPage();
   do {
